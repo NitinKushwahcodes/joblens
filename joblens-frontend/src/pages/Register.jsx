@@ -12,9 +12,9 @@ function getStrength(password) {
 }
 
 const strengthConfig = {
-  weak:   { label: 'Weak',   color: 'bg-red-500',    text: 'text-red-500',    width: 'w-1/3' },
-  medium: { label: 'Medium', color: 'bg-yellow-400',  text: 'text-yellow-500', width: 'w-2/3' },
-  strong: { label: 'Strong', color: 'bg-emerald-500', text: 'text-emerald-500', width: 'w-full' },
+  weak:   { label: 'Weak — add numbers or special characters',   color: 'bg-red-500',    text: 'text-red-500',     width: 'w-1/3' },
+  medium: { label: 'Medium — add a special character to strengthen', color: 'bg-yellow-400', text: 'text-yellow-500',  width: 'w-2/3' },
+  strong: { label: 'Strong password',  color: 'bg-emerald-500', text: 'text-emerald-500', width: 'w-full' },
 };
 
 export default function Register() {
@@ -34,14 +34,19 @@ export default function Register() {
     try {
       await register(form.name, form.email, form.password);
       navigate('/dashboard');
-    }catch (err) {
-    // Network error — server se connect hi nahi hua
-    if (!err.response) {
-      setError('Cannot connect to server. Please try again later.');
-    } else {
-      // Server connected but returned error (wrong password etc.)
-      setError(err.response?.data?.message || 'Registration failed');
-    }
+    } catch (err) {
+      if (!err.response) {
+        // server unreachable — no internet or server is down
+        setError('Unable to reach the server. Check your internet connection or try again later.');
+      } else if (err.response.status === 409) {
+        setError('An account with this email already exists. Try logging in instead.');
+      } else if (err.response.status === 400) {
+        setError(err.response.data?.message || 'Please fill in all fields correctly.');
+      } else if (err.response.status >= 500) {
+        setError('Server error. Please try again in a moment.');
+      } else {
+        setError(err.response.data?.message || 'Registration failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -57,16 +62,27 @@ export default function Register() {
         <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">Start optimizing your applications</p>
 
         {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm rounded-lg px-4 py-3 mb-4">
-            {error}
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm rounded-lg px-4 py-3 mb-4 flex items-start gap-2">
+            <span className="mt-0.5 shrink-0">⚠️</span>
+            <span>{error}</span>
           </div>
         )}
 
+        {/*
+          autoComplete="off" on the FORM would block browser suggestions — we never want that.
+          Each input has its own specific autoComplete value so Chrome knows exactly
+          what to suggest and whether to offer a strong password.
+        */}
         <form onSubmit={handle} className="flex flex-col gap-4">
           <div>
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">Full Name</label>
+            <label htmlFor="reg-name" className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
+              Full Name
+            </label>
             <input
+              id="reg-name"
               type="text"
+              name="name"
+              autoComplete="name"
               value={form.name}
               onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
               className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -74,10 +90,16 @@ export default function Register() {
               required
             />
           </div>
+
           <div>
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">Email</label>
+            <label htmlFor="reg-email" className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
+              Email
+            </label>
             <input
+              id="reg-email"
               type="email"
+              name="email"
+              autoComplete="email"
               value={form.email}
               onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
               className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -85,26 +107,40 @@ export default function Register() {
               required
             />
           </div>
+
           <div>
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">Password</label>
+            <label htmlFor="reg-password" className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
+              Password
+            </label>
+            {/*
+              autoComplete="new-password" is the key:
+              - Tells Chrome this is a NEW password field (not login)
+              - Triggers Google's "Suggest strong password" option
+              - Also enables saving this credential after successful register
+            */}
             <input
+              id="reg-password"
               type="password"
+              name="password"
+              autoComplete="new-password"
               value={form.password}
               onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
               className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               placeholder="••••••••"
               required
             />
-            {/* live strength indicator */}
+
+            {/* live strength bar */}
             {sc && (
               <div className="mt-2">
                 <div className="h-1.5 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                   <div className={`h-full rounded-full transition-all duration-300 ${sc.color} ${sc.width}`} />
                 </div>
-                <p className={`text-xs mt-1 font-medium ${sc.text}`}>{sc.label} password</p>
+                <p className={`text-xs mt-1 font-medium ${sc.text}`}>{sc.label}</p>
               </div>
             )}
           </div>
+
           <button
             type="submit"
             disabled={loading}
