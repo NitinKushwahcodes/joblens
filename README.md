@@ -1,48 +1,14 @@
-<div align="center">
+# JobLens — AI-Powered Job Application Optimizer
 
-<img src="https://img.shields.io/badge/JobLens-AI%20Job%20Optimizer-4f46e5?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMiAyQzYuNDggMiAyIDYuNDggMiAxMnM0LjQ4IDEwIDEwIDEwIDEwLTQuNDggMTAtMTBTMTcuNTIgMiAxMiAyek0xMSAxN0g5VjdoMnYxMHptNCAwaC0yVjdoMnYxMHoiLz48L3N2Zz4=" alt="JobLens">
+> Upload resume → Paste JD → Get match score + cover letter + recruiter email + interview tips
 
-# JobLens
+- Live Demo: https://joblens-liard.vercel.app/ 
+- Project Walkthrough (Video): https://your-video-link  
 
-### AI-Powered Job Application Optimizer
-
-**Upload resume → Paste JD → Get match score + cover letter + recruiter email + interview tips**
-
-<br/>
-
-[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Coming_Soon-gray?style=for-the-badge)](https://joblens.vercel.app)
-[![Backend](https://img.shields.io/badge/Backend-Node.js_+_Express-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://joblens-backend.onrender.com)
-[![Frontend](https://img.shields.io/badge/Frontend-React_+_Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://joblens.vercel.app)
-[![AI](https://img.shields.io/badge/AI-Gemini_2.0_Flash-4285F4?style=for-the-badge&logo=google&logoColor=white)](#)
-[![License](https://img.shields.io/badge/License-MIT-emerald?style=for-the-badge)](#)
-
-<br/>
-
-> 🔗 **Live Demo:** _[Add your Vercel URL here after deployment]_
->
-> Built by **[Nitin Kushwah](https://www.linkedin.com/in/nitin-kushwah-iitg)** · IIT Guwahati · BS (Hons) Data Science & AI
-
-</div>
 
 ---
 
-## 📌 Table of Contents
-
-- [What is JobLens?](#-what-is-joblens)
-- [Features](#-features)
-- [Tech Stack](#-tech-stack)
-- [Project Structure](#-project-structure)
-- [System Architecture](#-system-architecture)
-- [Scoring Algorithm](#-scoring-algorithm)
-- [Security Implementation](#-security-implementation)
-- [Getting Started](#-getting-started)
-- [Environment Variables](#-environment-variables)
-- [API Reference](#-api-reference)
-- [Deployment](#-deployment)
-- [Screenshots](#-screenshots)
-- [Author](#-author)
-
----
+## Overview & Features
 
 ## 🎯 What is JobLens?
 
@@ -63,73 +29,31 @@ Built for **freshers and students** targeting their first internship or job. Eve
 
 ---
 
-## ✨ Features
+**Resume Parsing** — Upload a PDF resume. The server extracts raw text via `pdf-parse`, sends it to Gemini 2.0 Flash with a structured prompt, and stores the result as a JSON object with skills, projects, experience, education, and achievements. Projects and professional experience are strictly separated in the prompt — the most common failure mode in naive LLM parsers.
 
-### 🤖 AI Resume Parsing
-Upload your PDF resume and AI extracts structured data — summary, skills, projects (strictly separate from experience), education, and achievements. No manual entry needed.
+**Match Scoring** — Paste any job description. A four-category deterministic algorithm (not AI) computes a score out of 100. The score is mathematically honest — an unrelated JD scores below 30, a well-matched fresher JD scores 80+.
 
-### 📊 Smart Match Scoring
-A 4-category algorithm (not AI-generated) scores your resume against any job description:
-- **Skills** — 50 points
-- **Experience / Projects** — 30 points (fresher-aware)
-- **Education tier** — 10 points
-- **Domain keywords** — 10 points
+**Application Materials** — When score ≥ 60, the system generates a cover letter that references your actual projects, a recruiter cold email with subject line, a referral message for LinkedIn/WhatsApp alumni outreach, and role-specific interview tips.
 
-Honest scoring: a random JD scores < 25. A well-matched fresher JD can score 90+.
+**Application Tracker** — Track every job across two tabs: Not Ready and Applied. Log interview rounds with titles and descriptions. Add notes per application.
 
-### 📝 AI-Generated Application Materials
-When score ≥ 60, get:
-- **Cover letter** — 3 paragraphs, mentions your actual projects
-- **Recruiter cold email** — subject line + body, max 150 words
-- **Referral message** — casual WhatsApp/LinkedIn tone for alumni
-
-### 🎯 Interview Preparation
-- Role-specific interview tips (not generic advice)
-- What topics to prepare based on the actual JD
-- Tailored resume summary for each application
-
-### 📋 Application Tracker
-- Two-tab view: **Not Ready** vs **Applied**
-- Log interview rounds (OA, Technical, HR) with descriptions and dates
-- Notes for each application
-- Move jobs between tabs as your status changes
-
-### 🌙 Dark / Light Mode
-Full dark mode support with persistent preference via localStorage.
-
-### 🔒 Production-Grade Security
-httpOnly JWT cookies, bcrypt password hashing, helmet headers, CORS, rate limiting.
+**Auth & Security** — JWT stored in `httpOnly` cookies. bcrypt at salt rounds 12. helmet headers. Rate limiting. CORS with credentials.
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
-### Backend
-| Technology | Purpose |
+| Layer | Technology |
 |---|---|
-| **Node.js + Express** | Server framework — non-blocking I/O, fast API responses |
-| **MongoDB + Mongoose** | NoSQL database — nested analysis data fits document model perfectly |
-| **JWT in httpOnly Cookies** | Auth — more secure than localStorage, blocks XSS token theft |
-| **bcryptjs (12 rounds)** | Password hashing — salt rounds 12 = ~300ms, brute force resistant |
-| **Gemini 2.0 Flash** | Primary AI — fastest Gemini model, structured JSON output |
-| **Groq llama-3.3-70b** | Silent AI fallback — if Gemini fails, Groq handles it transparently |
-| **multer + pdf-parse** | PDF upload handling + text extraction on server |
-| **helmet** | Sets 14 HTTP security headers automatically |
-| **express-rate-limit** | 100 req/15 min per IP — protects AI API quota |
-
-### Frontend
-| Technology | Purpose |
-|---|---|
-| **React 18 + Vite** | UI framework — instant HMR, fast builds |
-| **React Router v6** | Client-side routing with nested protected routes |
-| **Tailwind CSS** | Utility-first styling with `darkMode: 'class'` |
-| **Axios (withCredentials)** | HTTP client — sends cookies automatically, no token handling in JS |
-| **Recharts** | Dashboard bar chart — jobs by status |
-| **Context API** | Global state for auth and dark mode |
-
-### Fonts
-- **DM Sans** — body text
-- **JetBrains Mono** — scores and numbers
+| Frontend | React 18, Vite, Tailwind CSS, Recharts |
+| Backend | Node.js, Express.js |
+| Database | MongoDB Atlas, Mongoose |
+| Auth | JWT in httpOnly cookies, bcryptjs |
+| AI — Primary | Google Gemini 2.0 Flash (direct HTTPS, no SDK) |
+| AI — Fallback | Groq llama-3.3-70b (silent, automatic) |
+| File Handling | multer, pdf-parse |
+| Security | helmet, express-rate-limit, CORS |
+| Deployment | Vercel (frontend), Render (backend) |
 
 ---
 
@@ -258,178 +182,76 @@ joblens/
 
 ---
 
-## 📐 Scoring Algorithm
-
-Total: **100 points** across 4 categories. Computed in code — not by AI.
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│  SKILLS (50 pts)                                            │
-│  match ratio = matchedSkills / totalJDSkills                │
-│  ≥ 50%  match  → 50 pts                                    │
-│  25–49% match  → proportional 25–50 pts                    │
-│  0–24%  match  → proportional 0–25 pts                     │
-├─────────────────────────────────────────────────────────────┤
-│  EXPERIENCE / PROJECTS (30 pts)  ← fresher-aware           │
-│  JD has "fresher/intern/0-1 year/student" keywords?         │
-│    YES → projects carry full 30 pts, no penalty             │
-│    NO  → has experience → 30 pts                            │
-│          no experience  → 10 pts (projects only)            │
-├─────────────────────────────────────────────────────────────┤
-│  EDUCATION (10 pts)                                         │
-│  IIT / NIT / BITS / IISc / IIIT-H → 10 pts                 │
-│  Other college                     → 5 pts                  │
-│  Not detected                      → 3 pts                  │
-├─────────────────────────────────────────────────────────────┤
-│  DOMAIN KEYWORDS (10 pts)                                   │
-│  REST API, Git, Agile, Docker, Microservices...             │
-│  3+ matches → 10 pts  │  1-2 → 5 pts  │  0 → 0 pts         │
-└─────────────────────────────────────────────────────────────┘
-FINAL = sum clamped to 100
-```
-
-**Example — IIT fresher applying to Meesho SDE Intern:**
-| Category | Calculation | Points |
-|---|---|---|
-| Skills | 4/6 JD skills matched = 67% | 50 |
-| Experience | JD has "intern" keyword → fresher-friendly | 30 |
-| Education | IIT Guwahati → Tier 1 | 10 |
-| Keywords | REST API + Git matched | 10 |
-| **Total** | | **100** |
-
----
-
-## 🔒 Security Implementation
-
-### JWT in httpOnly Cookies
-
-```javascript
-// Set on login/register
-res.cookie('token', jwt, {
-  httpOnly: true,      // JS cannot read — blocks XSS token theft
-  secure: true,        // HTTPS only in production
-  sameSite: 'strict',  // blocks CSRF attacks
-  maxAge: 7 * 24 * 60 * 60 * 1000  // 7 days
-})
-
-// Read in authMiddleware — NOT Authorization header
-const token = req.cookies?.token
-```
-
-**Why cookies > localStorage:**
-- `localStorage` is accessible via JavaScript → any XSS vulnerability can steal your token
-- `httpOnly` cookies are completely invisible to JavaScript — even malicious scripts can't read them
-- `sameSite: strict` prevents the cookie from being sent on cross-site requests (CSRF protection)
-- Frontend has zero token handling — `axios withCredentials: true` handles everything automatically
-
-### Other Layers
-| Layer | Implementation |
-|---|---|
-| **Password hashing** | bcryptjs, salt rounds 12 (~300ms per hash) |
-| **HTTP headers** | helmet — sets X-Frame-Options, CSP, XSS-Protection, HSTS, etc. |
-| **Rate limiting** | 100 requests / 15 min per IP via express-rate-limit |
-| **File validation** | multer: PDF MIME type only, 5MB max, user-id-based filenames |
-| **CORS** | Specific origin only (CLIENT_URL), credentials: true |
-| **Field projection** | Password field `select: false` — never returned in queries |
-
----
-
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Node.js 18+
-- MongoDB Atlas account (free tier works)
+- MongoDB Atlas account
 - Gemini API key — [aistudio.google.com](https://aistudio.google.com)
-- Groq API key — [console.groq.com](https://console.groq.com) (free)
+- Groq API key — [console.groq.com](https://console.groq.com)
 
-### Clone the repo
+### Clone & Run
 
 ```bash
 git clone https://github.com/NitinKushwahcodes/joblens.git
 cd joblens
 ```
 
-### Run the Backend
-
+**Backend**
 ```bash
 cd backend
 npm install
-cp .env.example .env
-# Fill in your values in .env
-npm run dev
-# Server starts at http://localhost:5000
+cp .env.example .env   # fill in your values
+npm run dev            # runs on http://localhost:5000
 ```
 
-### Run the Frontend
-
+**Frontend**
 ```bash
 cd frontend
 npm install
-cp .env.example .env
-# Set VITE_API_URL=http://localhost:5000
-npm run dev
-# App opens at http://localhost:5173
+cp .env.example .env   # set VITE_API_URL=http://localhost:5000
+npm run dev            # runs on http://localhost:5173
 ```
 
----
+### Environment Variables
 
-## 🔑 Environment Variables
-
-### Backend (`backend/.env`)
-
+**`backend/.env`**
 ```env
-# MongoDB Atlas connection string
-MONGO_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/joblens
-
-# JWT secret — make this long and random (32+ chars)
-JWT_SECRET=your_long_random_secret_key_here
-
-# Set to 'production' on Render
+MONGO_URI=mongodb+srv://<user>:<password>@cluster.mongodb.net/joblens
+JWT_SECRET=your_long_random_secret_32_chars_min
 NODE_ENV=development
-
-# Your React app URL (Vercel URL in production)
 CLIENT_URL=http://localhost:5173
-
-# AI Keys
 GEMINI_API_KEY=AIzaSy...
 GROQ_API_KEY=gsk_...
-
 PORT=5000
 ```
 
-### Frontend (`frontend/.env`)
-
+**`frontend/.env`**
 ```env
-# Your Express server URL (Render URL in production)
 VITE_API_URL=http://localhost:5000
 ```
 
 ---
 
-## 📡 API Reference
-
-Base URL: `http://localhost:5000` (dev) / `https://joblens-backend.onrender.com` (prod)
+## API Reference
 
 All protected routes require the JWT cookie (set automatically after login).
 
 ### Auth
-
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
 | `POST` | `/api/auth/register` | ❌ | Create account, sets cookie |
 | `POST` | `/api/auth/login` | ❌ | Login, sets cookie |
 | `POST` | `/api/auth/logout` | ❌ | Clears cookie |
-| `GET` | `/api/auth/me` | ✅ | Get current user info |
+| `GET` | `/api/auth/me` | ✅ | Get current user |
 
 ### Resume
-
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
 | `POST` | `/api/resume/upload` | ✅ | Upload PDF → AI parse → save |
-| `GET` | `/api/resume/active` | ✅ | Get current active resume |
+| `GET` | `/api/resume/active` | ✅ | Get active resume |
 
 ### Jobs
-
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
 | `POST` | `/api/jobs` | ✅ | Add job + run AI analysis |
@@ -441,131 +263,31 @@ All protected routes require the JWT cookie (set automatically after login).
 | `DELETE` | `/api/jobs/:id` | ✅ | Hard delete job |
 
 ### Analysis
-
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
 | `GET` | `/api/analysis/stats` | ✅ | Dashboard stats (total, applied, notReady, avgScore) |
 
-### Example: Add a Job
+---
 
-```bash
-curl -X POST http://localhost:5000/api/jobs \
-  -H "Content-Type: application/json" \
-  --cookie "token=your_jwt_here" \
-  -d '{
-    "company": "Meesho",
-    "role": "SDE Intern",
-    "jobDescription": "Looking for a fresher SDE intern with Node.js, React, MongoDB skills...",
-    "notes": "Referred by IIT alumni"
-  }'
-```
+## Deployment
 
-**Response:**
-```json
-{
-  "job": {
-    "_id": "...",
-    "company": "Meesho",
-    "role": "SDE Intern",
-    "status": "applied",
-    "analysis": {
-      "matchScore": 84,
-      "matchedSkills": ["node.js", "react", "mongodb"],
-      "missingSkills": ["redis"],
-      "coverLetter": "...",
-      "recruiterEmail": "...",
-      "referralMessage": "...",
-      "interviewTips": ["..."]
-    }
-  }
-}
-```
+**Backend → Render**
+- New Web Service → connect repo → set Root Directory to `backend`
+- Build: `npm install` · Start: `node server.js`
+- Add all env variables from `backend/.env`, set `NODE_ENV=production`
+
+**Frontend → Vercel**
+- New Project → connect repo → set Root Directory to `frontend`
+- Framework: Vite · Add `VITE_API_URL=<your-render-url>`
+
+After both are deployed, update `CLIENT_URL` in Render env to your Vercel URL and redeploy backend.
 
 ---
 
-## ☁️ Deployment
+## Author
 
-### Backend → [Render](https://render.com)
-
-1. Push `backend/` folder to GitHub
-2. Render → New Web Service → connect repo
-3. Set:
-   - **Build Command:** `npm install`
-   - **Start Command:** `node server.js`
-4. Add all environment variables from `backend/.env`
-5. Set `NODE_ENV=production` and `CLIENT_URL=<your-vercel-url>`
-
-> **Note:** Render free tier has ~30 second cold start on first request.
-
-### Frontend → [Vercel](https://vercel.com)
-
-1. Push `frontend/` folder to GitHub
-2. Vercel → New Project → import repo
-3. Framework: **Vite** (auto-detected)
-4. Add environment variable:
-   - `VITE_API_URL` = your Render backend URL
-5. Deploy
-
-### Post-Deploy Checklist
-
-```
-□ Register + login works on live URL
-□ httpOnly cookie set in production (check DevTools → Application → Cookies)
-□ Resume PDF upload and AI parsing works
-□ Add job → analysis + score returned correctly
-□ Dark mode toggle persists on refresh
-□ Update CLIENT_URL on Render to your Vercel URL
-```
+**Nitin Kushwah** · [linkedin.com/in/nitin-kushwah-iitg](https://www.linkedin.com/in/nitin-kushwah-iitg)
 
 ---
 
-## 📸 Screenshots
-
-> _Screenshots will be added after deployment_
-
-| Page | Description |
-|---|---|
-| Landing | Hero section with features and CTA |
-| Dashboard | Stats cards, bar chart, recent jobs |
-| Resume | Parsed resume with skills, projects, achievements |
-| Job Detail (Not Ready) | Match score, missing skills, improvement tips |
-| Job Detail (Applied) | 5 tabs: Analysis, Cover Letter, Recruiter Email, Referral, Rounds |
-
----
-
-## 🗺 Roadmap
-
-- [ ] Redis job queue for async AI processing
-- [ ] Resume versioning — compare match scores across resume versions
-- [ ] Email notifications for application follow-ups
-- [ ] Browser extension to auto-extract JD from LinkedIn/Naukri
-- [ ] Analytics dashboard — skill gap analysis over time
-- [ ] AI interview simulator with role-specific questions
-
----
-
-## 👤 Author
-
-**Nitin Kushwah**
-
-- 🎓 BS (Hons) Data Science & AI — IIT Guwahati (2023–2027)
-- 💼 LinkedIn: [linkedin.com/in/nitin-kushwah-iitg](https://www.linkedin.com/in/nitin-kushwah-iitg)
-- 📧 Email: [nitin.kushwah.cs@gmail.com](mailto:nitin.kushwah.cs@gmail.com)
-- 💻 GitHub: [github.com/NitinKushwahcodes](https://github.com/NitinKushwahcodes)
-- 🏆 LeetCode 1580 · Codeforces 1208 · CodeChef 1495
-
----
-
-## 📄 License
-
-MIT License — use, modify, distribute freely with attribution.
-
----
-
-<div align="center">
-
-**Built with focus, not just code.**
-
-⭐ Star this repo if you found it useful
-
-</div>
+*MIT License*
