@@ -17,13 +17,18 @@ export default function Login() {
       await login(form.email, form.password);
       navigate('/dashboard');
     } catch (err) {
-    // Network error — server se connect hi nahi hua
-    if (!err.response) {
-      setError('Cannot connect to server. Please try again later.');
-    } else {
-      // Server connected but returned error (wrong password etc.)
-      setError(err.response?.data?.message || 'Login failed');
-    }
+      if (!err.response) {
+        // no response at all — server down or no internet
+        setError('Unable to reach the server. Check your internet connection or try again later.');
+      } else if (err.response.status === 401) {
+        setError('Incorrect email or password. Please try again.');
+      } else if (err.response.status === 400) {
+        setError(err.response.data?.message || 'Please fill in all fields.');
+      } else if (err.response.status >= 500) {
+        setError('Server error. Please try again in a moment.');
+      } else {
+        setError(err.response.data?.message || 'Login failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -39,16 +44,23 @@ export default function Login() {
         <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">Sign in to your account</p>
 
         {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm rounded-lg px-4 py-3 mb-4">
-            {error}
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm rounded-lg px-4 py-3 mb-4 flex items-start gap-2">
+            <span className="mt-0.5 shrink-0">⚠️</span>
+            <span>{error}</span>
           </div>
         )}
 
-        <form onSubmit={handle} className="flex flex-col gap-4">
+        {/* autocomplete="on" tells browser to enable saved credentials for this form */}
+        <form onSubmit={handle} autoComplete="on" className="flex flex-col gap-4">
           <div>
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">Email</label>
+            <label htmlFor="login-email" className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
+              Email
+            </label>
             <input
+              id="login-email"
               type="email"
+              name="email"
+              autoComplete="email"
               value={form.email}
               onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
               className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -56,10 +68,16 @@ export default function Login() {
               required
             />
           </div>
+
           <div>
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">Password</label>
+            <label htmlFor="login-password" className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
+              Password
+            </label>
             <input
+              id="login-password"
               type="password"
+              name="password"
+              autoComplete="current-password"
               value={form.password}
               onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
               className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -67,6 +85,7 @@ export default function Login() {
               required
             />
           </div>
+
           <button
             type="submit"
             disabled={loading}
