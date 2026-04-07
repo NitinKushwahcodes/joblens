@@ -17,7 +17,13 @@ export default function Login() {
       await login(form.email, form.password);
       navigate('/dashboard');
     } catch (err) {
+    // Network error — server se connect hi nahi hua
+    if (!err.response) {
+      setError('Cannot connect to server. Please try again later.');
+    } else {
+      // Server connected but returned error (wrong password etc.)
       setError(err.response?.data?.message || 'Login failed');
+    }
     } finally {
       setLoading(false);
     }
