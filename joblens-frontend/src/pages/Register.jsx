@@ -34,8 +34,14 @@ export default function Register() {
     try {
       await register(form.name, form.email, form.password);
       navigate('/dashboard');
-    } catch (err) {
+    }catch (err) {
+    // Network error — server se connect hi nahi hua
+    if (!err.response) {
+      setError('Cannot connect to server. Please try again later.');
+    } else {
+      // Server connected but returned error (wrong password etc.)
       setError(err.response?.data?.message || 'Registration failed');
+    }
     } finally {
       setLoading(false);
     }
