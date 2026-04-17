@@ -3,7 +3,7 @@
 > Upload resume → Paste JD → Get match score + cover letter + recruiter email + interview tips
 
 - Live Demo: https://joblens-liard.vercel.app/ 
-- Project Walkthrough (Video): https://your-video-link  
+- Project Walkthrough (Video): https://youtu.be/jY1r3FGtYeQ
 
 
 ---
